@@ -36,7 +36,7 @@ Reviewed on 25 October 2026 against the supplied challenge brief. Checked items 
 
 - [ ] Check the GitHub Actions run for the pushed commit. Both backend and frontend jobs should be green. Local success does not establish CI success.
 
-- [ ] Verify Docker startup. Docker is not available on PATH in this environment, so this was not run. Install/start Docker Desktop with Linux containers, then from the repository root:
+- [x] Docker startup verified on 25 October 2026. Both images built and services started; backend is healthy. Local homepage, readiness, and metadata return 200; readiness reports real snapshot data with 1,488 actual slots and 11,873 forecast rows. Added Docker exclusions for host dependencies and generated files. To reproduce with Docker Desktop running, from the repository root:
 
   ```powershell
   docker compose config
