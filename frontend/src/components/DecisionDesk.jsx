@@ -30,18 +30,19 @@ function Worksheet({ s, settings, setSettings }) {
         options={[{ value: 0.8, label: "P80" }, { value: 0.9, label: "P90" }, { value: 0.95, label: "P95" }]} />
       <p className="ws__big">{num(s.buffer_mw)}<small>MW buffer</small></p>
       <p className="ws__hint">
-        Hold back this much wind when planning. In past half-hours, wind fell short of the forecast by more than this about {100 - pct}% of the time.
-        The shaded band is wider on both sides (P{100 - pct} to P{pct}), so about {2 * pct - 100}% of outcomes should land inside it.
+        This buffer uses the empirical P{pct} shortfall from past errors. Its target exceedance rate is {100 - pct}%, not a guarantee for the next day.
+        The band starts at P{100 - pct} to P{pct} of past errors, then widens if needed to include the forecast and clips its lower edge at zero.
       </p>
       <dl className="ws__rows">
         <div><dt>Forecast wind</dt><dd>{num(s.avg_forecast_mw)} MW avg, {gwh(s.energy_mwh)} GWh</dd></div>
         <div><dt>Wind to rely on</dt><dd>{num(s.avg_firm_mw)} MW avg, {gwh(s.firm_energy_mwh)} GWh</dd></div>
       </dl>
       <label className="field">
-        <span>Expected demand in MW, flat all day (optional)</span>
+        <span>Illustrative national demand in MW, flat all day (optional)</span>
         <input type="number" inputMode="numeric" min="0" step="100" placeholder="For example 20000"
           value={settings.demand} onChange={(e) => setSettings({ demand: e.target.value })} />
       </label>
+      <p className="ws__foot">This illustration subtracts national wind from national demand. A utility must first establish its contracted or allocated wind share; national output is not its own supply.</p>
       {s.demand && (
         <dl className="ws__rows">
           <div><dt>Buy from other sources</dt><dd>{gwh(s.demand.procure_mwh)} GWh, {num(s.demand.avg_procure_mw)} MW avg</dd></div>
@@ -50,9 +51,10 @@ function Worksheet({ s, settings, setSettings }) {
         </dl>
       )}
       {bt && (
-        <Notice tone="info" title="How well has this method worked?">
+        <Notice tone="info" title="Retrospective evaluation across the full data window">
           Rebuilding the band each day from only past errors, actual wind fell below it in {num(bt.below_band_pct, 1)}% of half-hours
           (the aim is {num(bt.target_pct, 0)}%) and above it in {num(bt.above_band_pct, 1)}%, across {bt.days} days.
+          This evaluation includes outcomes after the selected decision date; it was not available at that decision time.
           A big gap from the aim means the buffer is a rough guide only.
         </Notice>
       )}
@@ -98,7 +100,7 @@ export default function DecisionDesk({ meta, date, setDate, settings, setSetting
         value: s.issued_first === s.issued_last ? hhmm(s.issued_last) : `${hhmm(s.issued_first)} to ${hhmm(s.issued_last)}`,
         note: `${d1 === d2 ? dayLabel(d2) : `${dayLabel(d1)} to ${dayLabel(d2)}`}, ${num(s.lead_h_min)} to ${num(s.lead_h_max)} h before delivery` },
       s.band_available
-        ? { label: "Suggested buffer", value: num(s.buffer_mw), unit: "MW", note: `Guards against a P${pct} shortfall` }
+        ? { label: "Suggested buffer", value: num(s.buffer_mw), unit: "MW", note: `Historical P${pct} shortfall; not guaranteed` }
         : { label: "Suggested buffer", value: "Not yet", note: `Needs ${s.history.required_days} days of past errors` },
       s.band_available
         ? { label: "Wind to rely on", value: num(s.avg_firm_mw), unit: "MW avg", note: "Forecast minus buffer" }

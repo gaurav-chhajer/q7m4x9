@@ -12,7 +12,7 @@ import { Brand } from "./ui.jsx";
 function copy(stage, { cutoff, chosen, acc }) {
   const s = acc?.summary;
   if (stage === 0) return ["Tomorrow's wind isn't known yet.",
-    "Every hour a fresh forecast is published for the day you're buying. Each dot is one of them, all for the same half-hour tomorrow."];
+    "Forecasts are revised throughout the day. Each dot is one publication, all for the same half-hour of delivery."];
   if (stage === 1) return [`You decide at ${cutoff}.`,
     "Forecasts published after that haven't happened yet. They tend to be better, but you can't use them."];
   if (stage === 2) return ["One forecast matters: the last one before you decide.",

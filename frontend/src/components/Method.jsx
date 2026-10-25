@@ -26,9 +26,9 @@ export default function Method({ meta }) {
           </ul>
         </Panel>
         <Panel title="The buffer and the band">
-          <p>Two different things come from the same past errors. The <strong>buffer</strong> is one-sided: at P90 it is the shortfall that wind exceeded only 1 half-hour in 10. The <strong>band</strong> is two-sided: it runs from P10 to P90 of past errors around the forecast, so about 80% of outcomes should land inside it and 10% on each side.</p>
+          <p>Two different things come from the same past errors. The <strong>buffer</strong> is one-sided: at P90 it uses the empirical 90th percentile of past shortfalls, floored at zero. This targets a 10% exceedance rate, not a guarantee. The <strong>band</strong> starts from P10 to P90 of actual-minus-forecast errors, then widens if needed to contain the forecast and clips its lower edge at zero. Its nominal central coverage is 80%; the adjustments and changing conditions mean realised coverage can differ.</p>
           <p>A day's band uses only delivery days up to two days earlier, because the previous day is still unfinished when you buy. With fewer than {meta.min_history_days} such days there is <strong>no band and no buffer</strong>; the forecast is still shown. Nothing from later days is ever used.</p>
-          <p>The errors are pooled across hours and wind levels, so the band is a rough guide. The worksheet reports a walk-forward back-test of how often actual wind really fell outside the band.</p>
+          <p>The errors are pooled across hours and wind levels, so the band is a rough guide. Adjacent half-hours are correlated; three days of history is a minimum for this pilot, not evidence of reliable tail calibration. The worksheet reports a retrospective walk-forward evaluation across the full data window, including outcomes after the selected date. Each evaluated day's band is trained only on its own past history.</p>
         </Panel>
         <Panel title="Data">
           <ul>
@@ -50,7 +50,7 @@ export default function Method({ meta }) {
             <li>One month is a small sample. The band describes January's conditions, not every season.</li>
             <li>The band is pooled across the day. It does not yet widen for windier hours, and the table in the accuracy lab shows errors do grow with output.</li>
             <li>Wind curtailment and embedded wind are not modelled; the actuals are Elexon's national wind outturn.</li>
-            <li>The procurement worksheet assumes flat demand. It is a planning aid, not a trading signal.</li>
+            <li>The procurement worksheet illustrates national residual demand using a flat demand input. A utility needs its contracted or allocated wind share before applying this to its own purchases. It is a planning aid, not a trading signal.</li>
           </ul>
         </Panel>
       </div>

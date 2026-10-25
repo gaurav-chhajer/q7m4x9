@@ -4,8 +4,10 @@ A decision desk for UK day-ahead power buyers. For any delivery day it shows **t
 
 Built for the REint Full Stack SWE challenge. Data: Elexon BMRS (`FUELHH` actual wind, `WINDFOR` wind forecasts).
 
-- **Live app:** _add your Vercel URL here_
+- **Live app:** https://wind-ward-web-application.vercel.app/
 - **Walkthrough video:** _add your unlisted YouTube URL here_
+
+See [SUBMISSION_CHECKLIST.md](SUBMISSION_CHECKLIST.md) for remaining submission steps and [DEMO_OUTLINE.md](DEMO_OUTLINE.md) for the video plan.
 
 ## What it does
 
@@ -25,7 +27,7 @@ docker compose up --build
 # open http://localhost:8080
 ```
 
-The repo ships with **generated sample data** so this works immediately. A red banner is shown while sample data is in use. Load the real data first (next section) for real numbers.
+The repo includes a real Elexon snapshot for the challenge window, plus generated sample data as a fallback. The backend prefers the real snapshot. A red banner appears if sample data is in use.
 
 ### Load the real Elexon data (one time, about 2 minutes, needs internet)
 
@@ -70,9 +72,9 @@ The tests that matter most: no forecast published after the cutoff is ever selec
 
 **Sign convention.** Miss = forecast minus actual. Positive means the forecast was too high, the risky direction for a buyer.
 
-**Buffer and band.** Two different things from the same past misses at the same decision time. The *buffer* is one-sided: at P90 it is the shortfall that wind exceeded 1 half-hour in 10. The *band* is two-sided: P10 to P90 of past errors around the forecast, so about 80% of outcomes should fall inside it. A day's band uses only delivery days up to D-2, because D-1 is unfinished at decision time. With fewer than 3 such days there is **no band and no buffer** (2 to 5 Jan with the default settings); the forecast is still shown, and nothing from later days is ever used.
+**Buffer and band.** Two different things from the same past misses at the same decision time. The *buffer* uses the empirical P90 shortfall, floored at zero, targeting a 10% exceedance rate. This is not a guarantee. The *band* starts at P10 to P90 of actual-minus-forecast errors, widens if needed to include the forecast, and clips its lower edge at zero. Its nominal coverage is 80%; realised coverage can differ. A day's band uses only delivery days up to D-2, because D-1 is unfinished at decision time. With fewer than 3 such days there is **no band and no buffer** (2 to 5 Jan with the default settings); the forecast is still shown, and nothing from later days is ever used.
 
-**Back-test.** The worksheet reports a walk-forward check: rebuilding each day's band from strictly past errors, how often actual wind fell below or above it, against the intended 10%. The errors are pooled across hours and wind levels, so treat the buffer as a rough guide.
+**Back-test.** The worksheet reports a retrospective evaluation across the full data window, including outcomes after the selected decision date. It is not information available at that decision time. This is a walk-forward check: rebuilding each day's band from strictly past errors, how often actual wind fell below or above it, against the intended 10%. The errors are pooled across hours and wind levels, so treat the buffer as a rough guide.
 
 **Static snapshot.** The scope is a closed historical month, so the data is fetched once and served from CSV files. This makes the demo fast and reliable, keeps Vercel functions tiny, and makes every number reproducible. `scripts/ingest.py` is the repeatable pipeline. The backend uses only the Python standard library plus FastAPI, which keeps cold starts short.
 
@@ -103,7 +105,9 @@ The tests that matter most: no forecast published after the cutoff is ever selec
 - Run `npm install` once and commit `frontend/package-lock.json` so builds use `npm ci` and are reproducible.
 - The band is pooled across the day and does not yet widen for windier hours.
 - Wind curtailment and embedded wind are not modelled.
-- The worksheet assumes flat demand and is a planning aid only.
+- The worksheet illustrates national residual demand with a flat national demand input. A utility must establish its contracted or allocated wind share before using this for its own purchases.
+- Only forecast vintages within 48 hours of delivery are retained. Older fallback forecasts are outside this pilot scope; missing eligible forecasts remain gaps.
+- Three days is the pilot minimum for a band. Correlated half-hours and a short history limit tail calibration.
 - Fonts load from Google Fonts. To self-host, replace the `<link>` in `frontend/index.html` with `@fontsource` packages.
 
 ## Project layout
@@ -121,7 +125,7 @@ vercel.json             Vercel build and routing
 
 ## AI usage disclosure
 
-_Required by the brief. Replace this paragraph with your own account._ Example: "I used Claude (Anthropic) to help design the architecture and to draft the code, tests and documentation. I reviewed all generated code, ran the test suites, loaded and checked the real Elexon data, and changed X and Y."
+OpenAI Codex was used to review the implementation against the assignment, investigate deployment routing, add the header SVG as a favicon, refine statistical and procurement explanations, update documentation, and run validation checks. This disclosure describes the assistance documented in this development session; any additional AI tools used earlier should also be disclosed by the author before submission.
 
 ## Data attribution
 
