@@ -1,0 +1,26 @@
+{
+  "synthetic": false,
+  "source": "Elexon BMRS Insights API (FUELHH fuelType=WIND, WINDFOR)",
+  "endpoints": [
+    "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream",
+    "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream"
+  ],
+  "delivery_start": "2026-01-02",
+  "delivery_end": "2026-02-01",
+  "generated_at": "2026-10-25T12:53:01Z",
+  "rows": {
+    "actuals": 1488,
+    "forecasts": 11873
+  },
+  "forecast_resolution": "hourly",
+  "issue_times": [
+    "18:30",
+    "15:30",
+    "09:30",
+    "07:30",
+    "04:30",
+    "02:30",
+    "22:30",
+    "11:30"
+  ]
+}
